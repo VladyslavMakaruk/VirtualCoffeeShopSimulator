@@ -13,7 +13,7 @@ import util.exceptions.OrderParsingException
 
 object inputParser {
 
-  def parseOrder(input: String): Either[OrderParsingException, Order] = {
+  def apply(input: String): Either[OrderParsingException, Order] = {
     val orderParts = input.strip().split("-").toList
     orderParts match {
       case coffeeStr :: beanStr :: sizeStr :: rest =>
@@ -30,7 +30,7 @@ object inputParser {
                     toppings <- parseToppingsList(toppingStrs)
                   } yield MilkCoffeeOrder(milkCoffee, beans, size, milk, toppings)
                 case Nil =>
-                  Left(OrderParsingException("milk coffee requires milk type"))
+                  Left(OrderParsingException("milk coffee requires milk"))
               }
             case blackCoffee: BlackCoffee =>
               parseToppingsList(rest)
@@ -91,7 +91,7 @@ object inputParser {
       Right(toppings)
     else
       Left(
-        OrderParsingException.wrongToppingType(errors.map(_.getMessage).mkString("\n"))
+        OrderParsingException(errors.map(_.getMessage).mkString("\n"))
       )
   }
 }

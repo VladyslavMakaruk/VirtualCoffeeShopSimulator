@@ -1,7 +1,15 @@
 package util.exceptions
 
 
-class OrderParsingException(message: String) extends Exception(message){}
+class OrderParsingException(val message: String) extends Exception(message) {
+
+  override def equals(obj: Any): Boolean = {
+    obj match {
+      case exception: OrderParsingException => this.message.equals(exception.message)
+      case _ => false
+    }
+  }
+}
 
 object OrderParsingException {
   private val wrongBeanNameTemplate = "There is no \"%s\" bean type"
@@ -24,5 +32,5 @@ object OrderParsingException {
   }  
   def wrongToppingType(toppingName: String): OrderParsingException = {
     new OrderParsingException(wrongToppingNameTemplate.format(toppingName))
-  }  
+  }
 }

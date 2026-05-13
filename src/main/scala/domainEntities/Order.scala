@@ -5,7 +5,6 @@ package domainEntities
 
 sealed trait Order
 
-
 case class BlackCoffeeOrder(
    coffee: BlackCoffee,
    beans: Beans,
@@ -24,7 +23,6 @@ case class MilkCoffeeOrder(
 /*
    price -> (coffeePrice[beans]) * volume + milkPrice[milkType] * volume + all_toppings_price
 */
-
 
 enum Size:
   case Small
