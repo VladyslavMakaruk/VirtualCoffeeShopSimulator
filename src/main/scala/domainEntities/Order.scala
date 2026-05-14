@@ -5,14 +5,50 @@ package domainEntities
 
 sealed trait Order
 
-case class BlackCoffeeOrder(
+type percentage = Int
+
+class Discount(amount: percentage) {
+  def getDiscount:percentage = amount
+} 
+
+object Discount {
+  private  val discountValues: Map[String,Discount] =
+    Map(
+      "25SUMMER25" -> new Discount(25), 
+      "NEWAVE" -> new Discount(15),
+      "EASYTOGO" -> new Discount(10) 
+    )
+
+  def apply(code: String): Option[Discount] = {
+    discountValues.get(code)
+  }
+}
+
+case class DiscountBlackCoffeeOrder(
+  discount: Discount,                                 
+  coffee: BlackCoffee,
+  beans: Beans,
+  size: Size,
+  topping: Seq[Topping]
+) extends Order
+
+case class DiscountMilkCoffeeOrder(
+   discount: Discount,                                     
+   coffee: MilkCoffee,
+   beans: Beans,
+   size: Size,
+   milk: Milk,
+   topping: Seq[Topping]
+ ) extends Order
+
+case class DefaultBlackCoffeeOrder(
    coffee: BlackCoffee,
    beans: Beans,
    size: Size,
    topping: Seq[Topping]
 ) extends Order
 
-case class MilkCoffeeOrder(
+case class DefaultMilkCoffeeOrder(
     coffee: MilkCoffee,
     beans: Beans,
     size: Size,

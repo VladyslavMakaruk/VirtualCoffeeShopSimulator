@@ -13,14 +13,22 @@ object PricingEngine {
   private def toppingsPrice(toppings: Seq[Topping]): Int = {
     toppings.map(_.getPrice).sum
   }
-                                //Either [Int,Exception]
-  def countPrice(order: Order): Int = {
+  
+  def countPrice(order: Order): Double = {
     order match {
-      case BlackCoffeeOrder(coffee,beans,size,topping) => {
+      case DefaultBlackCoffeeOrder(coffee, beans, size, topping) => {
         coffeePrice(coffee,beans,size) + toppingsPrice(topping)
       }
-      case MilkCoffeeOrder(coffee,beans,size,milk,topping) => {
+      case DiscountBlackCoffeeOrder(discount, coffee, beans, size, topping) => {
+        (coffeePrice(coffee,beans,size) + toppingsPrice(topping))
+          / 100.0 * (100 - discount.getDiscount)
+      }
+      case DefaultMilkCoffeeOrder(coffee, beans, size, milk, topping) => {
         coffeePrice(coffee,beans,size) + milkPrice(coffee, size, milk) +  toppingsPrice(topping)
+      }
+      case DiscountMilkCoffeeOrder(discount, coffee, beans, size, milk, topping) => {
+        (coffeePrice(coffee, beans, size) + milkPrice(coffee, size, milk) + toppingsPrice(topping))
+         / 100.0 * (100 - discount.getDiscount) 
       }
     }
   }

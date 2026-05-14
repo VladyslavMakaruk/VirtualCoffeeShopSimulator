@@ -17,6 +17,7 @@ object OrderParsingException {
   private val wrongSizeNameTemplate = "There is no \"%s\" size type"
   private val wrongMilkNameTemplate = "There is no \"%s\" milk type"
   private val wrongToppingNameTemplate = "There is no \"%s\" topping type"
+  private val invalidCodeNameTemplate = "Invalid discount code \"%s\""
   
   def wrongBeanType(beanName:String): OrderParsingException = {
     new OrderParsingException(wrongBeanNameTemplate.format(beanName))
@@ -32,5 +33,8 @@ object OrderParsingException {
   }  
   def wrongToppingType(toppingName: String): OrderParsingException = {
     new OrderParsingException(wrongToppingNameTemplate.format(toppingName))
+  }
+  def wrongDiscountValue(code: String): OrderParsingException = {
+    new OrderParsingException(invalidCodeNameTemplate.format(code))
   }
 }
