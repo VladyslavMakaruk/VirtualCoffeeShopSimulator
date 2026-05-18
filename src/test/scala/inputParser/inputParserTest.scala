@@ -5,6 +5,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.{TableDrivenPropertyChecks, TableFor1, TableFor2}
 import org.scalatest.prop.Tables.Table
+import org.scalatest.matchers.should.Matchers.*
 
 import scala.compiletime.constValueTuple
 import util.exceptions.OrderParsingException
@@ -13,24 +14,14 @@ import scala.deriving.Mirror
 
 class inputParserTest extends AnyFlatSpec with Matchers with TableDrivenPropertyChecks {
   "Input parser" should "return order" in {
-    forAll(ParserTestData.validData) { parserInput =>
-      assert({
-        inputParser(parserInput) match {
-          case Right(order: Order) => true
-          case _ => false
-        }
-      })
-    }
+  forAll(ParserTestData.validData) { input =>
+    inputParser(input) shouldBe a [Right[_, domainEntities.Order]]
   }
+}
 
   "Input parser" should "return exception" in {
     forAll(ParserTestData.invalidData) { (parserInput, exception) =>
-      assert({
-        inputParser(parserInput) match {
-          case Right(order: Order) => false
-          case Left(orderParsingException: OrderParsingException) => orderParsingException `equals` exception
-        }
-      })
+      inputParser(parserInput) shouldBe Left(exception)
     }
   }
 }
@@ -54,7 +45,7 @@ object ParserTestData {
   private def validBlackCoffeeOrders: List[String] = {
     val blackCoffeeMirror = summon[Mirror.SumOf[BlackCoffee]]
     for {
-       blackCoffeeType <- constValueTuple[blackCoffeeMirror.MirroredElemLabels].toList.map(_.toString)
+       blackCoffeeType <- constValueTuple[blackCoffeeMirror.MirroredElemLabels].asInstanceOf[Product].productIterator.map(_.toString).toList
        beansType <- Beans.values.map(_.toString)
        sizesType <- Size.values.map(_.toString)
        toppingsType <- Topping.values.map(_.toString)
@@ -64,7 +55,7 @@ object ParserTestData {
   private def validMilkCoffeeOrders: List[String] = {
     val milkCoffeeMirror = summon[Mirror.SumOf[MilkCoffee]]
     for {
-      milkCoffeeType <- constValueTuple[milkCoffeeMirror.MirroredElemLabels].toList.map(_.toString)
+      milkCoffeeType <- constValueTuple[milkCoffeeMirror.MirroredElemLabels].asInstanceOf[Product].productIterator.map(_.toString).toList
       beansType <- Beans.values.map(_.toString)
       sizesType <- Size.values.map(_.toString)
       milkType <- Milk.values.map(_.toString)

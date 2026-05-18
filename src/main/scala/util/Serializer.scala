@@ -1,0 +1,39 @@
+package util
+import domainEntities.Recipe
+import io.circe.Encoder.encodeString
+import io.circe.{Encoder, Json}
+import io.circe.syntax.*
+
+trait RecipeFormatter {
+  def format(recipe: Recipe): String
+}
+
+object RecipeFormatter {
+  given JSONFormatter: RecipeFormatter with {
+    implicit val encoder: Encoder[Recipe] = Encoder.instance{ r =>
+      val fields = List(
+        Some("machine_code" -> r.codeOfMachine.asJson),
+        Some("coffee" -> r.coffee.toString.asJson),
+        Some("beans" -> r.beans.toString.asJson),
+        r.milk.map("milk" -> _.toString.asJson),
+        Some("size" -> r.size.toString.asJson),
+        Some("price" -> r.price.asJson),
+        r.priceAfterDiscount.map("price_after_discount" -> _.asJson),
+        r.discount.map("discount" -> _.getDiscount.asJson),
+      ).flatten
+      Json.fromFields(fields)
+    }
+
+    override def format(recipe: Recipe): String =
+      encoder(recipe).toString
+
+  }
+}
+
+object Serializer {
+  def apply(recipe: Recipe)(using formatter: RecipeFormatter): String = {
+    formatter.format(recipe)
+  }
+}
+
+

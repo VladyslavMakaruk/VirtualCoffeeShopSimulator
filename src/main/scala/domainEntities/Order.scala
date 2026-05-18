@@ -3,13 +3,96 @@ package domainEntities
 
 // Order: CoffeType-BeansType-Size-Optional[MilkType]-Optional[Toppings]
 
-sealed trait Order
+sealed abstract class Order(val coffee: Coffee) {
+  def getBrewingTime: Int = this.coffee.getCoffeeBrewingTime
+}
 
-type percentage = Int
+sealed abstract class DiscountOrder(val discount: Discount, override val coffee: Coffee) extends Order(coffee)
 
-class Discount(amount: percentage) {
-  def getDiscount:percentage = amount
-} 
+
+class Discount(amount: Double) {
+  def getDiscount: Double = amount
+}
+
+trait PricingEngine {
+  def countPrice(order: Order): Double
+  def countPriceWithDiscount(order: DiscountOrder): Double
+}
+
+case class Recipe(
+     codeOfMachine: String,
+     coffee: Coffee,
+     beans: Beans,
+     size: Size,
+     price: Double,
+     priceAfterDiscount: Option[Double],
+     topping: List[Topping],
+     milk: Option[Milk],
+     discount: Option[Discount]
+ ) 
+
+object Recipe {
+  def apply(
+         codeOfMachine: String,
+         order: Order,
+         pricingEngine: PricingEngine  
+  ): Recipe = {
+      order match {
+        case DefaultBlackCoffeeOrder(coffee, beans, size, topping) => 
+          new Recipe(
+            codeOfMachine = codeOfMachine,
+            coffee = coffee,
+            beans = beans,
+            size = size,
+            price = pricingEngine.countPrice(order), 
+            priceAfterDiscount = None,
+            topping = topping,
+            milk = None,
+            discount = None)
+          
+        case order @ DiscountBlackCoffeeOrder(discount, coffee, beans, size, topping) =>
+          new Recipe(
+            codeOfMachine = codeOfMachine,
+            coffee = coffee,
+            beans = beans,
+            size = size,
+            price = pricingEngine.countPrice(order),
+            priceAfterDiscount = Some(pricingEngine.countPriceWithDiscount(order)),
+            topping = topping,
+            milk = None,
+            discount = Some(discount)
+          )
+          
+        case DefaultMilkCoffeeOrder(coffee, beans, size, milk, topping) =>
+          new Recipe(
+            codeOfMachine = codeOfMachine,
+            coffee = coffee,
+            beans = beans,
+            size = size,
+            price = pricingEngine.countPrice(order),
+            priceAfterDiscount = None,
+            topping = topping,
+            milk = Option(milk),
+            discount = None
+          )
+          
+        case order @ DiscountMilkCoffeeOrder(discount, coffee, beans, size, milk, topping) =>
+          new Recipe(
+            codeOfMachine = codeOfMachine,
+            coffee = coffee,
+            beans = beans,
+            size = size,
+            price = pricingEngine.countPrice(order),
+            priceAfterDiscount = Option(pricingEngine.countPriceWithDiscount(order)),
+            topping = topping,
+            milk = Option(milk),
+            discount = Option(discount)
+          )
+      }
+  }
+}
+
+
 
 object Discount {
   private  val discountValues: Map[String,Discount] =
@@ -25,40 +108,36 @@ object Discount {
 }
 
 case class DiscountBlackCoffeeOrder(
-  discount: Discount,                                 
-  coffee: BlackCoffee,
+  override val discount: Discount,
+  override val coffee: BlackCoffee,
   beans: Beans,
   size: Size,
-  topping: Seq[Topping]
-) extends Order
+  topping: List[Topping]
+) extends DiscountOrder(discount, coffee) 
 
 case class DiscountMilkCoffeeOrder(
-   discount: Discount,                                     
-   coffee: MilkCoffee,
+   override val discount: Discount,
+   override val coffee: MilkCoffee,
    beans: Beans,
    size: Size,
    milk: Milk,
-   topping: Seq[Topping]
- ) extends Order
+   topping: List[Topping]
+ ) extends DiscountOrder(discount, coffee)
 
 case class DefaultBlackCoffeeOrder(
-   coffee: BlackCoffee,
+   override val coffee: BlackCoffee,
    beans: Beans,
    size: Size,
-   topping: Seq[Topping]
-) extends Order
+   topping: List[Topping]
+) extends Order(coffee)
 
 case class DefaultMilkCoffeeOrder(
-    coffee: MilkCoffee,
+    override val coffee: MilkCoffee,
     beans: Beans,
     size: Size,
     milk: Milk,
-    topping: Seq[Topping]
-) extends Order
-
-/*
-   price -> (coffeePrice[beans]) * volume + milkPrice[milkType] * volume + all_toppings_price
-*/
+    topping: List[Topping]
+) extends Order(coffee)
 
 enum Size:
   case Small
@@ -88,6 +167,8 @@ enum Topping(price: Int):
 
 
 sealed trait Coffee {
+  val coffeeBrewingTime:Int
+  def getCoffeeBrewingTime: Int = this.coffeeBrewingTime
   val coffeeVolumes: Map[Size,Int]
   def getCoffeeVolume(size: Size):Int = this.coffeeVolumes(size)
 }
@@ -99,6 +180,7 @@ sealed trait MilkCoffee extends Coffee {
 }
 
 case object Latte extends MilkCoffee {
+  val coffeeBrewingTime: Int = 10000
   val coffeeVolumes: Map[Size,Int] = Map(
     Size.Small -> 10,
     Size.Medium -> 15,
@@ -115,6 +197,7 @@ case object Latte extends MilkCoffee {
 }
 
 case object Espresso extends BlackCoffee {
+  val coffeeBrewingTime: Int = 10000
   val coffeeVolumes: Map[Size, Int] = Map(
     Size.Small -> 12,
     Size.Medium -> 17,
@@ -124,6 +207,7 @@ case object Espresso extends BlackCoffee {
 }
 
 case object Americano extends BlackCoffee {
+  val coffeeBrewingTime: Int = 10000
   val coffeeVolumes: Map[Size, Int] = Map(
     Size.Small -> 8,
     Size.Medium -> 15,
@@ -133,6 +217,7 @@ case object Americano extends BlackCoffee {
 }
 
 case object Cappuccino extends MilkCoffee {
+  val coffeeBrewingTime: Int = 7000
   val coffeeVolumes: Map[Size, Int] = Map(
     Size.Small -> 7,
     Size.Medium -> 15,
@@ -149,6 +234,7 @@ case object Cappuccino extends MilkCoffee {
 }
 
 case object ColdBrew extends BlackCoffee {
+  val coffeeBrewingTime: Int = 10000
   val coffeeVolumes: Map[Size, Int] = Map(
     Size.Small -> 13,
     Size.Medium -> 15,
@@ -158,6 +244,7 @@ case object ColdBrew extends BlackCoffee {
 }
 
 case object GoldenLatte extends MilkCoffee {
+  val coffeeBrewingTime: Int = 10000
   val coffeeVolumes: Map[Size, Int] = Map(
     Size.Small -> 17,
     Size.Medium -> 20,
