@@ -10,8 +10,8 @@ trait RecipeFormatter {
 
 object RecipeFormatter {
   given JSONFormatter: RecipeFormatter with {
-    implicit val encoder: Encoder[Recipe] = Encoder.instance{ r =>
-      val fields = List(
+    given recipeEncoder: Encoder[Recipe] = Encoder.instance { r =>
+      val fields: List[(String, Json)] = List(
         Some("machine_code" -> r.codeOfMachine.asJson),
         Some("coffee" -> r.coffee.toString.asJson),
         Some("beans" -> r.beans.toString.asJson),
@@ -19,14 +19,15 @@ object RecipeFormatter {
         Some("size" -> r.size.toString.asJson),
         Some("price" -> r.price.asJson),
         r.priceAfterDiscount.map("price_after_discount" -> _.asJson),
+        if r.topping.nonEmpty then Some("toppings" -> r.topping.map(_.toString).asJson) else None,
         r.discount.map("discount" -> _.getDiscount.asJson),
       ).flatten
+
       Json.fromFields(fields)
     }
 
     override def format(recipe: Recipe): String =
-      encoder(recipe).toString
-
+      recipeEncoder(recipe).noSpaces
   }
 }
 
