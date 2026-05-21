@@ -1,7 +1,7 @@
-package inputGenerator
+package DataGeneration.inputGenerator
 
-import domainEntities.{Beans, BlackCoffee, Milk, MilkCoffee, Size, Topping}
-import inputGenerator.CoffeeType.{BlackCoffee, MilkCoffee}
+import CoffeeType.{BlackCoffee, MilkCoffee}
+import DataGeneration.domainEntities.{Beans, BlackCoffee, Milk, MilkCoffee, Size, Topping}
 
 import scala.compiletime.constValueTuple
 import scala.deriving.Mirror

@@ -1,12 +1,13 @@
 package util
 
-import domainEntities.Beans.Arabica
-import domainEntities.Size.Large
+import DataGeneration.domainEntities.Beans.Arabica
+import DataGeneration.domainEntities.{Americano, Order, Recipt}
+import DataGeneration.domainEntities.Size.Large
+import DataGeneration.util.Serializer
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.{TableDrivenPropertyChecks, TableFor1, TableFor2}
 import org.scalatest.prop.Tables.Table
-import domainEntities.{Americano, Order, Recipe}
 import io.circe.Json
 import org.scalatest.matchers.should.Matchers.{should, shouldBe}
 
@@ -19,10 +20,10 @@ class SerializerTest extends AnyFlatSpec with Matchers with TableDrivenPropertyC
 }
 
 object SerializerTestData {
-  val jsonData: TableFor2[Recipe,String] = {
+  val jsonData: TableFor2[Recipt,String] = {
     Table(
       ("recipe","serialized value"),
-      (new Recipe(
+      (new Recipt(
         codeOfMachine = "test",
         coffee = Americano,
         beans = Arabica,

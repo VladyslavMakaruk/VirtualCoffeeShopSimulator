@@ -1,6 +1,6 @@
-package core
+package DataGeneration.core
 
-import domainEntities.Order
+import DataGeneration.domainEntities.Order
 import scala.concurrent.Future
 
 class CoffeeMachine(val codeOfMachine: String){

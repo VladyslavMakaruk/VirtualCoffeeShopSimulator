@@ -1,8 +1,9 @@
-package main
-import core.{CoffeeShop, QueueMessage, ReceiptWriter, ShutdownSignal}
-import inputGenerator.OrdersGenerator
-import inputParser.*
-import util.TimeFormatter
+package DataGeneration.main
+
+import DataGeneration.core.{CoffeeShop, QueueMessage, ReceiptWriter, ShutdownSignal}
+import DataGeneration.inputGenerator.OrdersGenerator
+import DataGeneration.util.TimeFormatter
+
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -22,11 +23,11 @@ object Main {
     //join both and wait
     val isRunning = new AtomicBoolean(true)
     val inputDataQueue  = new LinkedBlockingQueue[String](10000)
-    val recipe = new LinkedBlockingQueue[QueueMessage](10000)
+    val recipeDataQueue = new LinkedBlockingQueue[QueueMessage](10000)
 
     ReceiptWriter.getValidatedFile(TimeFormatter.getFormattedCurrentDate) match {
       case Success(file) =>
-        val writer = ReceiptWriter(recipe,file)
+        val writer = ReceiptWriter(recipeDataQueue,file)
 
         val producer = Future {
           println("[Produced] has started generating orders.")
@@ -39,20 +40,19 @@ object Main {
               case Success(list) => list.foreach(inputDataQueue.put)
               case Failure(exception) => println(exception)
             }
-            Thread.sleep(100)
+            Thread.sleep(1000)
           }
         }
 
         val consumer = Future {
           println("[Consumer] has started handling orders.")
-          val ordersParser = CoffeeShop(3, recipe)
+          val ordersParser = CoffeeShop(3, recipeDataQueue)
           while (isRunning.get() || !inputDataQueue.isEmpty || ordersParser.hasActiveWork) {
-            val item = inputDataQueue.poll(100, TimeUnit.MILLISECONDS)
-            if (item != null) {
-              ordersParser(item)
+            Option(inputDataQueue.poll(100, TimeUnit.MILLISECONDS)) match {
+              case Some(valueToParse) => ordersParser(valueToParse)
+              case _ =>
             }
           }
-          println("[Consumer] Finished processing and brewing all orders.")
         }
 
         sys.addShutdownHook {
@@ -61,7 +61,7 @@ object Main {
           println("[Produced] Stopped generating orders.")
           Await.ready(consumer,Duration.Inf)
           println("[Consumer] Finished processing orders")
-          recipe.put(ShutdownSignal)
+          recipeDataQueue.put(ShutdownSignal)
           Await.ready(writer,Duration.Inf)
           println("Process was gracefully finished")
         }

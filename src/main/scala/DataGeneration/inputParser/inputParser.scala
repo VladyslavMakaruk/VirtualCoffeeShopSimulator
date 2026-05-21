@@ -1,7 +1,7 @@
-package inputParser
+package DataGeneration.inputParser
 
-import domainEntities.*
-import util.exceptions.OrderParsingException
+import DataGeneration.domainEntities.{Americano, Beans, BlackCoffee, Cappuccino, Coffee, ColdBrew, DefaultBlackCoffeeOrder, DefaultMilkCoffeeOrder, Discount, DiscountBlackCoffeeOrder, DiscountMilkCoffeeOrder, Espresso, GoldenLatte, Latte, Milk, MilkCoffee, Order, Size, Topping}
+import DataGeneration.util.exceptions.OrderParsingException
 
 // Order: Optional[Discount]-CoffeType-BeansType-Size-Optional[MilkType]-Optional[Toppings]
 // discount -> DISCOUNT[code]

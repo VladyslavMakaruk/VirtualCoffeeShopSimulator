@@ -1,5 +1,4 @@
-package domainEntities
-
+package DataGeneration.domainEntities
 
 // Order: CoffeType-BeansType-Size-Optional[MilkType]-Optional[Toppings]
 
@@ -19,7 +18,7 @@ trait PricingEngine {
   def countPriceWithDiscount(order: DiscountOrder): Double
 }
 
-case class Recipe(
+case class Recipt(
      codeOfMachine: String,
      coffee: Coffee,
      beans: Beans,
@@ -31,15 +30,15 @@ case class Recipe(
      discount: Option[Discount]
  ) 
 
-object Recipe {
+object Recipt {
   def apply(
          codeOfMachine: String,
          order: Order,
          pricingEngine: PricingEngine  
-  ): Recipe = {
+  ): Recipt = {
       order match {
         case DefaultBlackCoffeeOrder(coffee, beans, size, topping) => 
-          new Recipe(
+          new Recipt(
             codeOfMachine = codeOfMachine,
             coffee = coffee,
             beans = beans,
@@ -51,7 +50,7 @@ object Recipe {
             discount = None)
           
         case order @ DiscountBlackCoffeeOrder(discount, coffee, beans, size, topping) =>
-          new Recipe(
+          new Recipt(
             codeOfMachine = codeOfMachine,
             coffee = coffee,
             beans = beans,
@@ -64,7 +63,7 @@ object Recipe {
           )
           
         case DefaultMilkCoffeeOrder(coffee, beans, size, milk, topping) =>
-          new Recipe(
+          new Recipt(
             codeOfMachine = codeOfMachine,
             coffee = coffee,
             beans = beans,
@@ -77,7 +76,7 @@ object Recipe {
           )
           
         case order @ DiscountMilkCoffeeOrder(discount, coffee, beans, size, milk, topping) =>
-          new Recipe(
+          new Recipt(
             codeOfMachine = codeOfMachine,
             coffee = coffee,
             beans = beans,

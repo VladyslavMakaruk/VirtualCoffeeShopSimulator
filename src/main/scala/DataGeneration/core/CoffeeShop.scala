@@ -1,13 +1,13 @@
-package core
-import PricingEngine.DefaultPricingEngine
-import domainEntities.{Order, Recipe}
-import inputParser.inputParser
+package DataGeneration.core
+
+import DataGeneration.PricingEngine.DefaultPricingEngine
+import DataGeneration.domainEntities.{Order, Recipt}
+import DataGeneration.inputParser.inputParser
+import DataGeneration.util.{CodeGenerator, Serializer}
 
 import java.util.concurrent.LinkedBlockingQueue
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import util.CodeGenerator
-import util.Serializer
 
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -44,12 +44,12 @@ case class CoffeeShop(
     }
   }
 
-  private def processOrder(order: Order): Future[Recipe] = {
-    Future[Recipe] {
+  private def processOrder(order: Order): Future[Recipt] = {
+    Future[Recipt] {
       val machine = availableMachines.take()
       try {
         machine.brew(order.getBrewingTime)
-        Recipe(
+        Recipt(
           machine.codeOfMachine,
           order,
           DefaultPricingEngine

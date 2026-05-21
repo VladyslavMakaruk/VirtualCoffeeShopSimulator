@@ -1,6 +1,6 @@
-package core
+package DataGeneration.core
 
-import core.OutputFormat.JSON
+import OutputFormat.JSON
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.io.{BufferedWriter, File, FileWriter}

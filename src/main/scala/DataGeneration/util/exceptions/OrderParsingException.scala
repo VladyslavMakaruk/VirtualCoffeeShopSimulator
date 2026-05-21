@@ -1,5 +1,4 @@
-package util.exceptions
-
+package DataGeneration.util.exceptions
 
 class OrderParsingException(val message: String) extends Exception(message) {
 

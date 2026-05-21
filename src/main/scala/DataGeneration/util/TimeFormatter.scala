@@ -1,4 +1,4 @@
-package util
+package DataGeneration.util
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

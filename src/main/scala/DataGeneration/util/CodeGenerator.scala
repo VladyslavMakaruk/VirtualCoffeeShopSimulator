@@ -1,4 +1,5 @@
-package util
+package DataGeneration.util
+
 import scala.util.Random
 
 object CodeGenerator {

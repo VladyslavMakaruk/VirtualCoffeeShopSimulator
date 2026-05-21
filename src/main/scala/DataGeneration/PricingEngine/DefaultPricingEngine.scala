@@ -1,5 +1,6 @@
-package PricingEngine
-import domainEntities._
+package DataGeneration.PricingEngine
+
+import DataGeneration.domainEntities.{Beans, Coffee, DefaultBlackCoffeeOrder, DefaultMilkCoffeeOrder, DiscountBlackCoffeeOrder, DiscountMilkCoffeeOrder, DiscountOrder, Milk, MilkCoffee, Order, PricingEngine, Size, Topping}
 
 
 object DefaultPricingEngine extends PricingEngine {

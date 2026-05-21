@@ -1,16 +1,17 @@
-package util
-import domainEntities.Recipe
+package DataGeneration.util
+
+import DataGeneration.domainEntities.Recipt
 import io.circe.Encoder.encodeString
 import io.circe.{Encoder, Json}
 import io.circe.syntax.*
 
 trait RecipeFormatter {
-  def format(recipe: Recipe): String
+  def format(recipe: Recipt): String
 }
 
 object RecipeFormatter {
   given JSONFormatter: RecipeFormatter with {
-    given recipeEncoder: Encoder[Recipe] = Encoder.instance { r =>
+    given recipeEncoder: Encoder[Recipt] = Encoder.instance { r =>
       val fields: List[(String, Json)] = List(
         Some("machine_code" -> r.codeOfMachine.asJson),
         Some("coffee" -> r.coffee.toString.asJson),
@@ -26,13 +27,13 @@ object RecipeFormatter {
       Json.fromFields(fields)
     }
 
-    override def format(recipe: Recipe): String =
+    override def format(recipe: Recipt): String =
       recipeEncoder(recipe).noSpaces
   }
 }
 
 object Serializer {
-  def apply(recipe: Recipe)(using formatter: RecipeFormatter): String = {
+  def apply(recipe: Recipt)(using formatter: RecipeFormatter): String = {
     formatter.format(recipe)
   }
 }
