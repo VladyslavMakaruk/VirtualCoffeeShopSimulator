@@ -1,7 +1,7 @@
 package inputParser
 
 import DataGeneration.domainEntities.{Beans, BlackCoffee, Milk, MilkCoffee, Order, Size, Topping}
-import DataGeneration.inputParser.inputParser
+import DataGeneration.inputParser.InputParser
 import DataGeneration.util.exceptions.OrderParsingException
 import org.scalactic.Prettifier.default
 import org.scalatest.flatspec.AnyFlatSpec
@@ -16,13 +16,13 @@ import scala.deriving.Mirror
 class inputParserTest extends AnyFlatSpec with Matchers with TableDrivenPropertyChecks {
   "Input parser" should "return order" in {
   forAll(ParserTestData.validData) { input =>
-    inputParser(input) shouldBe a [Right[_, Order]]
+    InputParser(input) shouldBe a [Right[_, Order]]
   }
 }
 
   "Input parser" should "return exception" in {
     forAll(ParserTestData.invalidData) { (parserInput, exception) =>
-      inputParser(parserInput) shouldBe Left(exception)
+      InputParser(parserInput) shouldBe Left(exception)
     }
   }
 }

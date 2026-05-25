@@ -53,7 +53,7 @@ object JSONDeserializer {
 
   private def JSONtoReceipt(json: Json): Either[Exception, Recipt] = {
     val cursor = json.hcursor
-
+    
     for {
       machine_code       <- cursor.downField("machine_code").as[String]
       coffee             <- cursor.downField("coffee").as[String].flatMap(transformStringToCoffee)

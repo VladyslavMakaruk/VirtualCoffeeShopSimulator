@@ -1,9 +1,9 @@
 package DataGeneration.main
 
+import DataGeneration.core.OutputFormat.CSV
 import DataGeneration.core.{CoffeeShop, QueueMessage, ReceiptWriter, ShutdownSignal}
 import DataGeneration.inputGenerator.OrdersGenerator
 import DataGeneration.util.TimeFormatter
-
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -25,13 +25,14 @@ object Main {
     val inputDataQueue  = new LinkedBlockingQueue[String](10000)
     val recipeDataQueue = new LinkedBlockingQueue[QueueMessage](10000)
 
-    ReceiptWriter.getValidatedFile(TimeFormatter.getFormattedCurrentDate) match {
+    val fileExtension = CSV
+    
+    ReceiptWriter.getValidatedFile(TimeFormatter.getFormattedCurrentDate,fileFormat = fileExtension) match {
       case Success(file) =>
-        val writer = ReceiptWriter(recipeDataQueue,file)
-
+        val writer = ReceiptWriter.writeData(recipeDataQueue,file,fileExtension)
         val producer = Future {
           println("[Produced] has started generating orders.")
-          val ordersGenerator = OrdersGenerator(0.92, 0.5)
+          val ordersGenerator = OrdersGenerator(0.9, 0.5)
           while (isRunning.get()) {
             val possibleData = Try{
               ordersGenerator.generateAtMostNOrders()
@@ -49,7 +50,7 @@ object Main {
           val ordersParser = CoffeeShop(3, recipeDataQueue)
           while (isRunning.get() || !inputDataQueue.isEmpty || ordersParser.hasActiveWork) {
             Option(inputDataQueue.poll(100, TimeUnit.MILLISECONDS)) match {
-              case Some(valueToParse) => ordersParser(valueToParse)
+              case Some(valueToParse) => ordersParser.handle(valueToParse,fileExtension)
               case _ =>
             }
           }

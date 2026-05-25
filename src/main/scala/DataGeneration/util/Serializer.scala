@@ -33,7 +33,7 @@ object RecipeFormatter {
 }
 
 object Serializer {
-  def apply(recipe: Recipt)(using formatter: RecipeFormatter): String = {
+  def apply(recipe: Recipt)(formatter: RecipeFormatter): String = {
     formatter.format(recipe)
   }
 }

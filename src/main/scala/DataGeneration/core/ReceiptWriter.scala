@@ -30,7 +30,7 @@ case object ReceiptWriter {
     }
   }
 
-  def apply(queue: LinkedBlockingQueue[QueueMessage], file: File): Future[Unit] = {
+  def writeData(queue: LinkedBlockingQueue[QueueMessage], file: File, fileFormat: OutputFormat = JSON): Future[Unit] = {
     Future {
       Using(new BufferedWriter(new FileWriter(file,true))) { writer =>
         @scala.annotation.tailrec
@@ -53,4 +53,5 @@ case object ReceiptWriter {
 enum OutputFormat(val fileExtension: String):
   def apply():String = fileExtension
   case JSON extends OutputFormat(".json")
+  case CSV extends OutputFormat(".csv")
   //add more outputFormats

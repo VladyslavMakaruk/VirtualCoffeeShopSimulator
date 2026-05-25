@@ -11,7 +11,7 @@ import DataGeneration.util.exceptions.OrderParsingException
 //  parCofeT   parBean  pSize  pMilk|Topp  pToppings
 //
 
-object inputParser {
+object InputParser {
 
   def apply(input: String): Either[OrderParsingException, Order] = {
     val tokens = input.strip().split("-").toList

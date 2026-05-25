@@ -1,4 +1,5 @@
 package DataAnalysis.deserializer
+
 import DataAnalysis.deserializer.Format.{CSV, JSON}
 import DataGeneration.domainEntities.*
 
@@ -7,7 +8,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import scala.util.{Failure, Success, Try}
 
-object directoryReader {
+object DirectoryReader {
   private val validFileNameRegex = "\\d{2}-\\d{2}-\\d{4}\\.(json|csv)"
   private val defaultDirectory = "/Users/vmakaruk/coffeeShopApp/logs"
 
@@ -31,7 +32,7 @@ object directoryReader {
                 acc     <- eitherAcc
               } yield subList ++ acc
           }
-        } 
+        }
         result
       }
     } yield masterList
@@ -39,31 +40,31 @@ object directoryReader {
 
   //get list of valid files
   private def getFilesFromFolder(folderPath: String):Try[List[File]] = Try {
-      val directory = new File(folderPath)
-      if (directory.exists() && directory.isDirectory) {
-        val files = directory.listFiles.filter{
-          file => file.isFile && isValidFile(file)
-        }.toList
-        files
-      } else {
-        throw new IllegalArgumentException("given path does not exist or it's not a folder")
-      }
+    val directory = new File(folderPath)
+    if (directory.exists() && directory.isDirectory) {
+      val files = directory.listFiles.filter{
+        file => file.isFile && isValidFile(file)
+      }.toList
+      files
+    } else {
+      throw new IllegalArgumentException("given path does not exist or it's not a folder")
+    }
   }
 
   //files predicate
   private def isValidFile(file: File):Boolean = {
     // validFileFormat = dd-dd-dddd.(json|csv)
     (file.getName.endsWith(".json") || file.getName.endsWith(".csv"))
-    &&
-    file.getName.matches(validFileNameRegex)
+      &&
+      file.getName.matches(validFileNameRegex)
   }
 
 
   //transform file to list of orders objects
   private def transform(file: File):Try[List[ReciptWithDate]] = {
     getFileFormat(file).flatMap{
-      case JSON => getDateFromFileName(file,JSON).flatMap(format => JSONDeserializer(file,format))
-      case CSV => throw IllegalArgumentException("unsupported file format - CSV")
+      case JSON => getDateFromFileName(file,JSON).flatMap(JSONDeserializer(file,_))
+      case CSV => getDateFromFileName(file,CSV).flatMap(CSVDeserializer(file,_))
     }
   }
 
@@ -86,6 +87,6 @@ enum Format(extension: String):
   case JSON extends Format(".json")
 
 case class ReciptWithDate(
-     recipe: Recipt,
-     date: LocalDate
- )
+                           recipe: Recipt,
+                           date: LocalDate
+                         )

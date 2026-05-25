@@ -1,11 +1,11 @@
 package DataAnalysis.main
-import DataAnalysis.deserializer.directoryReader
+import DataAnalysis.deserializer.DirectoryReader
 
 import scala.util.{Failure, Success}
-import DataAnalysis.core.dataAnalyzer
+import DataAnalysis.core.DataAnalyzer
 import DataGeneration.domainEntities.{Milk, Topping, Beans}
 
-object main {
+object Main {
 
   /*
     Data analysis tasks:
@@ -20,10 +20,10 @@ object main {
         - resources consumption
   */
   def main(array: Array[String]): Unit = {
-    directoryReader.apply() match {
+    DirectoryReader.apply() match {
       case Success(listOfRecipts) =>
-        val resources = dataAnalyzer.resourcesConsumption(listOfRecipts)
-        val metrics = dataAnalyzer.dailyMetrics(listOfRecipts)
+        val resources = DataAnalyzer.resourcesConsumption(listOfRecipts)
+        val metrics = DataAnalyzer.dailyMetrics(listOfRecipts)
 
         val allDates = (resources.keys ++ metrics.keys.map(_._1)).toSet.toList.sorted
 

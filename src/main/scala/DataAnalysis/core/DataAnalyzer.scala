@@ -1,14 +1,14 @@
 package DataAnalysis.core
 import DataAnalysis.deserializer.ReciptWithDate
 import DataGeneration.domainEntities.{Coffee, MilkCoffee, Recipt}
-import DataAnalysis.dataEntities.{dailyResourcesConsumption, dailySalesData}
+import DataAnalysis.dataEntities.{DailyResourcesConsumption, DailySalesData}
 
 import java.time.LocalDate
 
 
-object dataAnalyzer {
+object DataAnalyzer {
 
-  def dailyMetrics(inputData: List[ReciptWithDate]):Map[(LocalDate,Coffee),dailySalesData]  = {
+  def dailyMetrics(inputData: List[ReciptWithDate]):Map[(LocalDate,Coffee),DailySalesData]  = {
 
     val groupedOrders = inputData
       // group by date and coffeeType
@@ -29,13 +29,13 @@ object dataAnalyzer {
             }
         }.sum
         val percentageOfOrdersWithDiscount = (ordersList.count(_.discount.nonEmpty) * 1.0 / totalOrdersCount) * 100
-        (date, coffee) -> dailySalesData(totalOrdersCount, totalRevenue, percentageOfOrdersWithDiscount)
+        (date, coffee) -> DailySalesData(totalOrdersCount, totalRevenue, percentageOfOrdersWithDiscount)
       }
 
     }
   }
   
-  def resourcesConsumption(inputData: List[ReciptWithDate]):Map[LocalDate,dailyResourcesConsumption] = {
+  def resourcesConsumption(inputData: List[ReciptWithDate]):Map[LocalDate,DailyResourcesConsumption] = {
     val groupedOrders = inputData.groupBy(_.date).map(kv => (kv._1,kv._2.map(_.recipe)))
 
     groupedOrders.map{
@@ -65,7 +65,7 @@ object dataAnalyzer {
           .groupBy(identity)
           .map((k, v) => (k, v.size))
 
-        (date,dailyResourcesConsumption(beansUsageMap,milkUsageMap,toppingsUsage))
+        (date,DailyResourcesConsumption(beansUsageMap,milkUsageMap,toppingsUsage))
     }
 
   }

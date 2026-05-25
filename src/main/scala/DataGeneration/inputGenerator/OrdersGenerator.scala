@@ -39,11 +39,17 @@ case class OrdersGenerator(percentageOfValidValues: Double, percentageOfBlackCof
   }
 
   private def generateBlackCoffeeOrder:String = {
-    s"$getDiscount-${getCoffeeType(BlackCoffee)}-${getValue[Beans]}-${getValue[Size]}${getToppings()}"
+    s"$createDiscount${getCoffeeType(BlackCoffee)}-${getValue[Beans]}-${getValue[Size]}${getToppings()}"
   }
 
   private def generateMilkCoffeeOrder:String = {
-    s"$getDiscount-${getCoffeeType(MilkCoffee)}-${getValue[Beans]}-${getValue[Size]}-${getValue[Milk]}${getToppings()}"
+    s"$createDiscount${getCoffeeType(MilkCoffee)}-${getValue[Beans]}-${getValue[Size]}-${getValue[Milk]}${getToppings()}"
+  }
+
+  private def createDiscount:String = {
+    if Random.nextDouble() < percentageOfValidValues
+      then  ""
+    else s"$getDiscount-"
   }
 
   private def getDiscount:String = {

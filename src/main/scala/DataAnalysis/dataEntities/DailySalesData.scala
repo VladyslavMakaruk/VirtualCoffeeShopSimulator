@@ -1,6 +1,6 @@
 package DataAnalysis.dataEntities
 
-case class dailySalesData(
+case class DailySalesData(
   totalOrdersCount: Int,
   totalRevenue: Double,
   percentageOfOrdersWithDiscount: Double
